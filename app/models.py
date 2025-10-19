@@ -101,5 +101,10 @@ class User(Base):
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.current_timestamp(),
                         onupdate=func.current_timestamp())
 
+    def check_password(self, password):
+        if password == self.password:
+            return True
+        return False
+
     # Relationships
     person = relationship("ComPerson", back_populates="users")
