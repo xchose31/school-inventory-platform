@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app import db
 from passlib.hash import bcrypt
+
 Base = db.Model
 from flask_login import UserMixin
 from app import login
@@ -104,14 +105,38 @@ class User(Base, UserMixin):
                         onupdate=func.current_timestamp())
 
     def check_password(self, password):
-
-
         return bcrypt.verify(password + self.open_password, self.password)
 
     # Relationships
     person = relationship("ComPerson", back_populates="users")
 
 
+class Material(Base):
+    __tablename__ = 'materials'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    filename = Column(String)
+    filepath = Column(String)
+    file_type = Column(String)
+    equipment_id = Column(Integer, ForeignKey('equipments.id', ondelete='CASCADE'))
+
+    # Relationships
+    equipment = relationship("Equipment", back_populates="materials")
+
+
+class Equipment(Base):
+    __tablename__ = 'equipments'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(255))
+    territory = Column(String(255))
+    office = Column(String(255))
+    description = Column(String)
+
+    # Relationships
+    materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")
+
+
 @login.user_loader
 def load_user(id):
-  return db.session.get(User, int(id))
+    return db.session.get(User, int(id))
