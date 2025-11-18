@@ -1,5 +1,5 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, abort
+from flask import render_template, flash, redirect, url_for, abort, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
@@ -65,27 +65,28 @@ def delete_equipment(id):
     return redirect(url_for('index'))
 
 
-# @app.route('/edit_equipment/<int:id>', methods=['GET', 'POST'])
-# @login_required
-# def edit_equipment(id):
-#     form = EquipmentForm(current_user.username)
-#     equipment = Equipment.query.get(id)
-#     if not equipment:
-#         abort(404)
-#     form.name.data = form.name
-#     form.territory.data = form.name
-#     form.office.data = form.name
-#     form.description.data = form.description
-#     if form.validate_on_submit():
-#         equipment.name = form.name.data
-#         equipment.territory = form.name.data
-#         equipment.office = form.name.data
-#         equipment.description = form.description.data
-#         db.session.commit()
-#         flash('Your changes have been saved.')
-#         return redirect(url_for('index'))
-#
-#     return render_template('add_equipment.html', form=form)
+@app.route('/edit_equipment/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_equipment(id):
+    equipment = Equipment.query.get_or_404(id)
+    form = EquipmentForm()
+
+    if form.validate_on_submit():
+        equipment.name = form.name.data
+        equipment.territory = form.territory.data
+        equipment.office = form.office.data
+        equipment.description = form.description.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for(f'equipment',id=equipment.id))
+    else:
+        form.name.data = equipment.name
+        form.territory.data = equipment.territory
+        form.office.data = equipment.office
+        form.description.data = equipment.description
+        form.submit.label.text = 'Изменить'
+
+    return render_template('add_equipment.html', form=form)
 
 
 # @app.route('/equipment_list')
