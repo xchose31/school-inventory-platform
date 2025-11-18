@@ -89,8 +89,8 @@ def edit_equipment(id):
     return render_template('add_equipment.html', form=form)
 
 
-# @app.route('/equipment_list')
-# @login_required
-# def equipment_list():
-#     equipments = Equipment.query.all()
-#     return render_template('equipment_list.html', equipments=equipments)
+@app.route('/equipment_list')
+@login_required
+def equipment_list():
+    equipments = Equipment.query.all()
+    return render_template('equipment_list2.html', equipments=equipments)
