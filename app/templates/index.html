@@ -1,5 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Добро пожаловать в систему инвентаризации школьного инвентаря!</h2>
+<h3>Вам доступны следующие функции:</h3>
+{% if current_user.person.emp_status.is_teacher %}
 
+<div class="w-100 w-md-75 w-lg-50 border border-success rounded p-3 mx-auto">
+    <h3>Для учителя:</h3>
+    <p><a href="{{url_for('equipment_list')}}">Просмотреть список всего оборудования</a></p>
+    <p><a href="{{url_for('add_equipment')}}">Добавить оборудование</a></p>
+    <p>Оставить заявку на ремонт</p>
+</div>
+{% endif %}
+{% if current_user.person.emp_status.is_technician %}
+<div class="w-100 w-md-75 w-lg-50 border border-success rounded p-2 mx-auto">
+    <h3>Для техника:</h3>
+    <p><a href="{{url_for('equipment_list')}}">Просмотреть заявки на ремонт</a></p>
+    <p><a href="{{url_for('add_equipment')}}">Добавить оборудование</a></p>
+</div>
+{% endif %}
 {% endblock %}

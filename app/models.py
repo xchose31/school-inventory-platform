@@ -41,7 +41,8 @@ class EmpStatus(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     pers_id = Column(Integer, ForeignKey('com_persons.id', ondelete='CASCADE'), unique=True)
-    active = Column(Integer, default=1)
+    is_teacher = Column(Integer, default=1)
+    is_technician = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
                         onupdate=func.current_timestamp())

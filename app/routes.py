@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, abort, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
-from app.models import User, Equipment
+from app.models import User, Equipment, ComPerson
 
 @app.route('/')
 def index():
@@ -94,3 +94,5 @@ def edit_equipment(id):
 def equipment_list():
     equipments = Equipment.query.all()
     return render_template('equipment_list2.html', equipments=equipments)
+
+
