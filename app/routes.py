@@ -1,12 +1,17 @@
+import os.path
+
 from app import app, db
-from flask import render_template, flash, redirect, url_for, abort, request
+from flask import render_template, flash, redirect, url_for, abort, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
 from app.models import User, Equipment, ComPerson
+from app.qr import generate_qr_code
 
 @app.route('/')
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -96,3 +101,12 @@ def equipment_list():
     return render_template('equipment_list2.html', equipments=equipments)
 
 
+@app.route('/equipment/<int:id>/qr')
+@login_required
+def equipment_qr(id):
+    path = f'..\qrcodes\qr_{id}.png'
+
+    if not os.path.exists(path):
+        generate_qr_code(id)
+
+    return send_file(path, mimetype='image/png')

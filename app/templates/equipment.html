@@ -22,26 +22,41 @@
                         <h1 class="card-title h3 mb-0">
                             <i class="fas fa-desktop me-2"></i>{{ equipment.name }}
                         </h1>
-                        <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
-                                    data-bs-toggle="dropdown">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <form action="{{ url_for('delete_equipment', id=equipment.id) }}" method="post" class="d-inline">
-                                        <button type="submit" class="dropdown-item text-danger"
-                                                onclick="return confirm('Вы уверены, что хотите удалить это оборудование? Это действие нельзя отменить.')">
-                                            <i class="fas fa-trash me-2"></i>Удалить оборудование
-                                        </button>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ url_for('equipment_qr', id=equipment.id) }}"
+                               class="btn btn-info btn-sm d-flex align-items-center"
+                               title="QR-код">
+                                <i class="fas fa-qrcode me-1"></i> QR
+                            </a>
+
+                            <!-- Кнопка Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form action="{{ url_for('edit_equipment', id=equipment.id) }}" method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-edit me-2"></i>Изменить оборудование
+                                            </button>
                                         </form>
-                                    <form action="{{ url_for('edit_equipment', id=equipment.id) }}" method="post" class="d-line">
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fas fa-trash me-2"></i>Изменить оборудование
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ url_for('delete_equipment', id=equipment.id) }}" method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить это оборудование? Это действие нельзя отменить.')">
+                                                <i class="fas fa-trash me-2"></i>Удалить оборудование
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -52,7 +67,6 @@
                         <div class="col-md-8">
                             <div class="equipment-info">
                                 <h3 class="h5 mb-4 text-primary">Основная информация</h3>
-
                                 <div class="info-grid">
                                     <div class="info-item">
                                         <div class="info-label">
