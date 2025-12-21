@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, SmallInteger, ForeignKey, Text, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Date, Boolean, SmallInteger, ForeignKey, Text, TIMESTAMP, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app import db
 from passlib.hash import bcrypt
+from enum import Enum as En
 
 Base = db.Model
 from flask_login import UserMixin
@@ -110,18 +110,18 @@ class User(Base, UserMixin):
 
     # Relationships
     person = relationship("ComPerson", back_populates="users")
+    repair_requests = relationship('RepairRequest', back_populates='user')
 
 
 class Material(Base):
     __tablename__ = 'materials'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    filename = Column(String)
+    title = Column(String)
     filepath = Column(String)
     file_type = Column(String)
-    equipment_id = Column(Integer, ForeignKey('equipments.id', ondelete='CASCADE'))
-
-    # Relationships
+    is_public = Column(Boolean)
+    equipment_id = Column(Integer, ForeignKey('equipments.id'), nullable=False)
     equipment = relationship("Equipment", back_populates="materials")
 
 
@@ -133,9 +133,27 @@ class Equipment(Base):
     territory = Column(String(255))
     office = Column(String(255))
     description = Column(String)
+    is_deleted = Column(Boolean, default=False)
 
     # Relationships
     materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")
+    repair_requests = relationship('RepairRequest', back_populates='equipment')
+
+
+class RepairRequest(Base):
+    __tablename__ = 'repair_requests'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    equipment_id = Column(Integer, ForeignKey('equipments.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    comment = Column(String())
+    priority = Column(String, default='средний')
+    is_completed = Column(Boolean, default=False)
+    creation_date = Column(TIMESTAMP, server_default=func.current_timestamp())
+    completion_date = Column(TIMESTAMP)
+
+    equipment = relationship('Equipment', back_populates='repair_requests')
+    user = relationship('User', back_populates='repair_requests')
 
 
 @login.user_loader

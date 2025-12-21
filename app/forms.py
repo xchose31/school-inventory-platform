@@ -18,3 +18,7 @@ class EquipmentForm(FlaskForm):
     office = StringField('Кабинет')
     description = TextAreaField('Описание')
     submit = SubmitField('Добавить')
+
+
+# class RepairForm(FlaskForm):
+#

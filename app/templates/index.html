@@ -1,22 +1,86 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Добро пожаловать в систему инвентаризации школьного инвентаря!</h2>
-<h3>Вам доступны следующие функции:</h3>
-{% if current_user.is_authenticated %}
-{% if current_user.person.emp_status.is_teacher %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-5 fw-bold text-primary">
+      Добро пожаловать в систему инвентаризации школьного оборудования!
+    </h1>
+    <p class="lead text-muted">
+      Управляйте, отслеживайте и подавайте заявки на ремонт техники в вашей школе.
+    </p>
+  </div>
 
-<div class="w-90 w-md-75 w-lg-50 border border-success rounded p-3 mx-auto">
-    <h3>Для учителя:</h3>
-    <p><a href="{{url_for('equipment_list')}}">Просмотреть список всего оборудования</a></p>
-    <p><a href="{{url_for('add_equipment')}}">Добавить оборудование</a></p>
-    <p>Оставить заявку на ремонт</p>
+  {% if current_user.is_authenticated %}
+    <div class="row justify-content-center g-4">
+      {% if current_user.person.emp_status.is_teacher %}
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card border-start border-4 border-success h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-success bg-opacity-10 p-3 rounded me-3">
+                  <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
+                </div>
+                <h2 class="h4 mb-0 text-success">Для учителя</h2>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item border-0 px-0">
+                  <a href="{{ url_for('equipment_list') }}" class="text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-list me-2 text-muted"></i>
+                    Просмотреть список всего оборудования
+                  </a>
+                </li>
+                <li class="list-group-item border-0 px-0">
+                  <a href="{{ url_for('add_equipment') }}" class="text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-plus-circle me-2 text-muted"></i>
+                    Добавить новое оборудование
+                  </a>
+                </li>
+                <li class="list-group-item border-0 px-0">
+                  <a href="{{ url_for('equipment_list') }}" class="text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-tools me-2 text-muted"></i>
+                    Оставить заявку на ремонт
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if current_user.person.emp_status.is_technician %}
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card border-start border-4 border-info h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                  <i class="fas fa-user-cog fa-2x text-info"></i>
+                </div>
+                <h2 class="h4 mb-0 text-info">Для техника</h2>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item border-0 px-0">
+                  <a href="" class="text-decoration-none d-flex align-items-center">
+                    <i class="fas fa-clipboard-list me-2 text-muted"></i>
+                    Просмотреть заявки на ремонт
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="alert alert-primary text-center d-flex align-items-center justify-content-center" role="alert">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          <a href="{{ url_for('login') }}" class="alert-link text-decoration-none">
+            Войдите в систему
+          </a>, чтобы увидеть доступные вам функции.
+        </div>
+      </div>
+    </div>
+  {% endif %}
 </div>
-{% endif %}
-{% if current_user.person.emp_status.is_technician %}
-<div class="w-00 w-md-75 w-lg-50 border border-success rounded p-2 mx-auto">
-    <h3>Для техника:</h3>
-    <p><a href="{{url_for('equipment_list')}}">Просмотреть заявки на ремонт</a></p>
-</div>
-{% endif %}
-{% endif %}
 {% endblock %}

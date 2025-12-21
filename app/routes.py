@@ -1,17 +1,14 @@
 import os.path
-
 from app import app, db
 from flask import render_template, flash, redirect, url_for, abort, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
-from app.models import User, Equipment, ComPerson
+from app.models import User, Equipment, ComPerson, RepairRequest
 from app.qr import generate_qr_code
 
 @app.route('/')
 def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -60,17 +57,17 @@ def equipment(id):
     equipment = Equipment.query.get_or_404(id)
     return render_template('equipment.html', equipment=equipment)
 
-@app.route('/delete_equipment/<int:id>', methods=['GET', 'POST'])
+@app.route('/equipment/<int:id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_equipment(id):
     equipment = Equipment.query.get(id)
-    db.session.delete(equipment)
+    equipment.is_deleted = True
     db.session.commit()
     flash('Оборудование успешно удалено!', 'success')
     return redirect(url_for('index'))
 
 
-@app.route('/edit_equipment/<int:id>', methods=['GET', 'POST'])
+@app.route('/equipment/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_equipment(id):
     equipment = Equipment.query.get_or_404(id)
@@ -97,7 +94,7 @@ def edit_equipment(id):
 @app.route('/equipment_list')
 @login_required
 def equipment_list():
-    equipments = Equipment.query.all()
+    equipments = Equipment.query.filter(Equipment.is_deleted == False).all()
     return render_template('equipment_list2.html', equipments=equipments)
 
 
@@ -110,3 +107,30 @@ def equipment_qr(id):
         generate_qr_code(id)
 
     return send_file(path, mimetype='image/png')
+
+@app.route('/equipment/<int:id>/add_material')
+@login_required
+def add_material(id):
+    pass
+
+
+@app.route('/equipment/<int:id>/request_repair', methods=['GET', 'POST'])
+@login_required
+def create_repair_request(id):
+    comment = request.form.get('comment', '').strip()
+    priority = request.form.get('priority', 'средний')
+    current_repair_requests = db.session.query(RepairRequest).filter(RepairRequest.is_completed == False).all()
+    if current_repair_requests:
+        flash('У этого оборудования уже есть невыполненная заявка на ремонт!', 'error')
+        return redirect(url_for('equipment', id=id))
+    repair_request = RepairRequest(
+        equipment_id=id,
+        comment=comment,
+        priority=priority,
+        user_id=current_user.id
+    )
+    db.session.add(repair_request)
+    db.session.commit()
+
+    flash('Заявка на ремонт успешно создана!', 'success')
+    return redirect(url_for('equipment', id=id))

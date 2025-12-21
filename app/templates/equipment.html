@@ -29,6 +29,11 @@
                                title="QR-код">
                                 <i class="fas fa-qrcode me-1"></i> QR
                             </a>
+                            <button type="button" class="btn btn-warning btn-sm d-flex align-items-center"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#repairModal">
+                                <i class="fas fa-wrench me-1"></i> Ремонт
+                            </button>
 
                             <!-- Кнопка Dropdown -->
                             <div class="dropdown">
@@ -45,7 +50,9 @@
                                             </button>
                                         </form>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li>
                                         <form action="{{ url_for('delete_equipment', id=equipment.id) }}" method="post"
                                               class="d-inline">
@@ -106,5 +113,37 @@
             </div>
         </div>
     </div>
+</div>
+<!-- Модальное окно для заявки на ремонт -->
+<div class="modal fade" id="repairModal" tabindex="-1" aria-labelledby="repairModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="repairModalLabel">Новая заявка на ремонт</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <form id="repairForm" method="POST" action="{{ url_for('create_repair_request', id=equipment.id) }}">
+          <div class="mb-3">
+            <label for="comment" class="form-label">Комментарий к неисправности</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+          </div>
+
+          <!-- Опционально: выбор приоритета (если вы добавили колонку priority) -->
+          <div class="mb-3">
+            <label for="priority" class="form-label">Приоритет</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="low">Низкий</option>
+              <option value="medium" selected>Средний</option>
+              <option value="high">Высокий</option>
+                <option value="critical">Критический</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Отправить заявку</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
