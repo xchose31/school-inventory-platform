@@ -149,6 +149,7 @@ class RepairRequest(Base):
     comment = Column(String())
     priority = Column(String, default='средний')
     is_completed = Column(Boolean, default=False)
+    completion_comment = Column(String)
     creation_date = Column(TIMESTAMP, server_default=func.current_timestamp())
     completion_date = Column(TIMESTAMP)
 
