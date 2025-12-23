@@ -1,4 +1,6 @@
 import os.path
+from functools import wraps
+
 from app import app, db
 from flask import render_template, flash, redirect, url_for, abort, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
@@ -6,6 +8,20 @@ from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
 from app.models import User, Equipment, ComPerson, RepairRequest
 from app.qr import generate_qr_code
+import requests
+
+
+def user_is_employer():
+    def decorator(f):
+        @wraps(f)
+        def decorated_func(*args, **kwargs):
+            if not (current_user.is_authenticated and current_user.person.emp_status.active):
+                abort(403)
+            return f(*args, **kwargs)
+
+        return decorated_func
+
+    return decorator
 
 
 @app.route('/')
@@ -21,11 +37,29 @@ def login():
             sa.select(User).where(User.username == form.username.data)
         )
         if user is not None:
-            # if not user.check_password(form.password.data):
-            #     flash('Invalid username or password')
-            #     return redirect(url_for('login'))
-            login_user(user, remember=form.remember_me.data)
-            return redirect(url_for('index'))
+            if user.username not in ['admin', 'student', 'technician']:
+                data = {'ver': '1.0',
+                        'get': 'auth',
+                        'username': str(user.username),
+                        'password': str(form.password.data)}
+                req = requests.get('https://lis.1502.moscow/api/auth.php', params=data)
+                if req.status_code == 200:
+                    data = {'ver': '1.0',
+                            'auth_code': req.json()['auth_code']}
+                    req2 = requests.get('https://lis.1502.moscow/api/auth.php', params=data)
+                    if req2.status_code == 200:
+                        user_id = req2.json()['uid']
+                        login_user(user, remember=form.remember_me.data)
+                        return redirect(url_for('index'))
+                    else:
+                        flash('Invalid username or password')
+                        return redirect(url_for('login'))
+                else:
+                    flash('Invalid username or password')
+                    return redirect(url_for('login'))
+            else:
+                login_user(user, remember=form.remember_me.data)
+                return redirect(url_for('index'))
         flash('Invalid username or password')
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
@@ -39,7 +73,7 @@ def logout():
 
 
 @app.route('/add_equipment', methods=['GET', 'POST'])
-@login_required
+@user_is_employer()
 def add_equipment():
     form = EquipmentForm()
     if form.validate_on_submit():
@@ -58,11 +92,15 @@ def add_equipment():
 @app.route('/equipment/<int:id>')
 def equipment(id):
     equipment = Equipment.query.get_or_404(id)
-    return render_template('equipment.html', equipment=equipment)
+    repair_requests = db.session.query(RepairRequest) \
+        .filter(RepairRequest.equipment_id == equipment.id) \
+        .order_by(RepairRequest.is_completed.asc(), RepairRequest.creation_date.desc()) \
+        .all()
+    return render_template('equipment.html', equipment=equipment, repair_requests=repair_requests)
 
 
 @app.route('/equipment/<int:id>/delete', methods=['GET', 'POST'])
-@login_required
+@user_is_employer()
 def delete_equipment(id):
     equipment = Equipment.query.get(id)
     equipment.is_deleted = True
@@ -72,7 +110,7 @@ def delete_equipment(id):
 
 
 @app.route('/equipment/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
+@user_is_employer()
 def edit_equipment(id):
     equipment = Equipment.query.get_or_404(id)
     form = EquipmentForm()
@@ -96,7 +134,7 @@ def edit_equipment(id):
 
 
 @app.route('/equipment_list')
-@login_required
+@user_is_employer()
 def equipment_list():
     equipments = Equipment.query.filter(Equipment.is_deleted == False).all()
     return render_template('equipment_list2.html', equipments=equipments)
@@ -114,13 +152,13 @@ def equipment_qr(id):
 
 
 @app.route('/equipment/<int:id>/add_material')
-@login_required
+@user_is_employer()
 def add_material(id):
     pass
 
 
 @app.route('/equipment/<int:id>/request_repair', methods=['GET', 'POST'])
-@login_required
+@user_is_employer()
 def create_repair_request(id):
     comment = request.form.get('comment', '').strip()
     priority = request.form.get('priority', 'средний')
@@ -142,7 +180,7 @@ def create_repair_request(id):
 
 
 @app.route('/repair_requests')
-@login_required
+@user_is_employer()
 def repair_requests_list():
     if not current_user.person.emp_status.is_technician:
         abort(403)
@@ -161,8 +199,9 @@ def repair_requests_list():
 
     return render_template('repair_requests.html', repair_requests=repair_requests)
 
+
 @app.route('/repair_requests/<int:id>', methods=['GET', 'POST'])
-@login_required
+@user_is_employer()
 def repair_request_detail(id):
     req = RepairRequest.query.get_or_404(id)
 
@@ -182,7 +221,24 @@ def repair_request_detail(id):
 
     return render_template('repair_request_detail.html', repair_request=req)
 
-@app.route('/complete_repair_request/<int:id>')
-@login_required
+
+@app.route('/complete_repair_request/<int:id>', methods=['GET', 'POST'])
+@user_is_employer()
 def complete_repair_request(id):
-    pass
+    req = RepairRequest.query.get_or_404(id)
+
+    if request.method == 'POST':
+        if not (current_user.is_authenticated and current_user.person.emp_status.is_technician):
+            flash("У вас нет прав для завершения заявок.", "danger")
+            return redirect(url_for('repair_request_detail', id=id))
+
+        if not req.is_completed:
+            completion_comment = request.form.get('completion_comment', '').strip()
+            req.is_completed = True
+            req.completion_date = db.func.now()
+            req.completion_comment = completion_comment
+            db.session.commit()
+            flash("Заявка успешно отмечена как выполненная.", "success")
+        return redirect(url_for('repair_request_detail', id=id))
+
+    return render_template('repair_request_detail.html', repair_request=req)

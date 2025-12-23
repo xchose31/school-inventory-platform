@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, SmallInteger, ForeignKey, Text, TIMESTAMP, Enum
+from sqlalchemy import Column, Integer, String, Date, Boolean, SmallInteger, ForeignKey, Text, TIMESTAMP, Enum, event
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app import db
@@ -41,7 +41,7 @@ class EmpStatus(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     pers_id = Column(Integer, ForeignKey('com_persons.id', ondelete='CASCADE'), unique=True)
-    is_teacher = Column(Integer, default=1)
+    is_teacher = Column(Integer, default=0)
     is_technician = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
@@ -49,6 +49,11 @@ class EmpStatus(Base):
 
     # Relationships
     person = relationship("ComPerson", back_populates="emp_status")
+
+    @property
+    def active(self):
+        return bool(self.is_teacher or self.is_technician)
+
 
 
 class StuClass(Base):
