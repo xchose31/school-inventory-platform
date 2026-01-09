@@ -139,6 +139,7 @@ class Equipment(Base):
     office = Column(String(255))
     description = Column(String)
     is_deleted = Column(Boolean, default=False)
+    photo_path = Column(String)
 
     # Relationships
     materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")

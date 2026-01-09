@@ -12,7 +12,8 @@
                     <h1 class="card-title h4 mb-0">Добавить оборудование</h1>
                 </div>
                 <div class="card-body">
-                    <form action="" method="post" novalidate class="equipment-form">
+                    <!-- Добавлен атрибут enctype для загрузки файлов -->
+                    <form action="" method="post" enctype="multipart/form-data" novalidate class="equipment-form">
                         {{ form.hidden_tag() }}
 
                         <div class="mb-4">
@@ -50,6 +51,18 @@
                             {% for error in form.description.errors %}
                             <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
+                        </div>
+
+                        <!-- Новое поле: загрузка изображения -->
+                        <div class="mb-4">
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control") }}
+                            {% for error in form.image.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text text-muted">
+                                Поддерживаются форматы: JPG, JPEG, PNG, GIF. Максимальный размер — зависит от настроек сервера.
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">

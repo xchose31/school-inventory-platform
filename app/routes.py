@@ -1,6 +1,6 @@
 import os.path
 from functools import wraps
-
+from .utils import save_file
 from app import app, db
 from flask import render_template, flash, redirect, url_for, abort, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
@@ -83,6 +83,11 @@ def add_equipment():
             office=form.office.data,
             description=form.description.data
         )
+        image = form.image.data
+        save = save_file(image, 'equipment')
+        if save:
+            equipment.photo_path = save
+
         db.session.add(equipment)
         db.session.commit()
         return redirect(f'equipment/{equipment.id}')
