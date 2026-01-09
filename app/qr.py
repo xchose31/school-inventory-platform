@@ -1,16 +1,10 @@
 import os
 import qrcode
-from PIL import *
-from PIL import ImageFont, ImageDraw, Image
-
-import os
-import qrcode
 from PIL import Image, ImageDraw, ImageFont
 
 
 def generate_qr_code(id):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    qr_dir = os.path.join(base_dir, "qrcodes")
+    qr_dir = "qrcodes"
     os.makedirs(qr_dir, exist_ok=True)
 
     url = f"http://192.168.0.16:5000/equipment/{id}"
@@ -51,7 +45,6 @@ def generate_qr_code(id):
         for font_path in font_paths:
             try:
                 font = ImageFont.truetype(font_path, font_size)
-                print(f"Используется шрифт: {font_path}")
                 break
             except:
                 continue
@@ -64,7 +57,6 @@ def generate_qr_code(id):
         except:
             # Используем дефолтный шрифт
             font = ImageFont.load_default()
-            print("Используется дефолтный шрифт")
 
     # Рассчитываем размеры текста
     draw_temp = ImageDraw.Draw(Image.new('RGB', (1, 1)))

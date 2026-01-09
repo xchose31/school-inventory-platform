@@ -143,7 +143,7 @@ def equipment_list():
 @app.route('/equipment/<int:id>/qr')
 @login_required
 def equipment_qr(id):
-    path = f'..\qrcodes\qr_{id}.png'
+    path = f'../qrcodes/qr_{id}.png'
 
     if not os.path.exists(path):
         generate_qr_code(id)
