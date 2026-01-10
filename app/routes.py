@@ -126,7 +126,7 @@ def edit_equipment(id):
         equipment.office = form.office.data
         equipment.description = form.description.data
         db.session.commit()
-        flash('Your changes have been saved.')
+        flash('Изменения сохранены.')
         return redirect(url_for(f'equipment', id=equipment.id))
     else:
         form.name.data = equipment.name
