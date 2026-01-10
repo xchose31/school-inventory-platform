@@ -28,7 +28,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     {{ form.territory.label(class="form-label") }}
-                                    {{ form.territory(class="form-control") }}
+                                    {{ form.territory(class="form-select") }}
                                     {% for error in form.territory.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
                                     {% endfor %}
@@ -37,7 +37,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     {{ form.office.label(class="form-label") }}
-                                    {{ form.office(class="form-control") }}
+                                    {{ form.office(class="form-select") }}
                                     {% for error in form.office.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
                                     {% endfor %}
