@@ -1,13 +1,17 @@
 import os
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 def generate_qr_code(id):
     qr_dir = "qrcodes"
     os.makedirs(qr_dir, exist_ok=True)
 
-    url = f"http://192.168.0.16:5000/equipment/{id}"
+    url = f"http://{os.getenv("FLASK_RUN_HOST")}:{os.getenv("FLASK_RUN_PORT")}/equipment/{id}"
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,

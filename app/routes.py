@@ -125,6 +125,9 @@ def edit_equipment(id):
         equipment.territory = form.territory.data
         equipment.office = form.office.data
         equipment.description = form.description.data
+        save = save_file(form.image.data, 'equipment')
+        if save:
+            equipment.photo_path = save
         db.session.commit()
         flash('Изменения сохранены.')
         return redirect(url_for(f'equipment', id=equipment.id))
