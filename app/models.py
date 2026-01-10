@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app import db
 from passlib.hash import bcrypt
-from enum import Enum as En
+import json
 
 Base = db.Model
 from flask_login import UserMixin
@@ -145,6 +145,12 @@ class Equipment(Base):
     # Relationships
     materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")
     repair_requests = relationship('RepairRequest', back_populates='equipment')
+
+    @property
+    def parsed_categories(self):
+        if self.categories:
+            return json.loads(self.categories)
+        return {}
 
 
 class RepairRequest(Base):

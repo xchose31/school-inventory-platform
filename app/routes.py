@@ -1,5 +1,9 @@
+import json
 import os.path
 from functools import wraps
+
+from unicodedata import category
+
 from .utils import save_file
 from app import app, db
 from flask import render_template, flash, redirect, url_for, abort, request, send_file
@@ -81,7 +85,8 @@ def add_equipment():
             name=form.name.data,
             territory=form.territory.data,
             office=form.office.data,
-            description=form.description.data
+            description=form.description.data,
+            categories=json.dumps({"type": form.equipment_type.data, "subject": form.subject.data})
         )
         image = form.image.data
         save = save_file(image, 'equipment')
@@ -126,6 +131,7 @@ def edit_equipment(id):
         equipment.office = form.office.data
         equipment.description = form.description.data
         save = save_file(form.image.data, 'equipment')
+        equipment.categories = json.dumps({"type": form.equipment_type.data, "subject": form.subject.data})
         if save:
             equipment.photo_path = save
         db.session.commit()
@@ -136,6 +142,10 @@ def edit_equipment(id):
         form.territory.data = equipment.territory
         form.office.data = equipment.office
         form.description.data = equipment.description
+        if equipment.parsed_categories['type']:
+            form.equipment_type.data = equipment.parsed_categories['type']
+        if equipment.parsed_categories['subject']:
+            form.subject.data = equipment.parsed_categories['subject']
         form.submit.label.text = 'Изменить'
 
     return render_template('add_equipment.html', form=form)

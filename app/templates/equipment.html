@@ -97,6 +97,26 @@
                                     </div>
                                 </div>
 
+                                <!-- Секция категорий — надёжная версия -->
+                                {% set cats = equipment.parsed_categories %}
+                                <div class="categories-section mt-4 p-3 bg-light rounded border">
+                                    <h4 class="h6 mb-3 text-primary d-flex align-items-center">
+                                        <i class="fas fa-layer-group me-2"></i>Категории оборудования
+                                    </h4>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if 'type' in cats and cats['type'] %}
+                                        <span class="badge bg-info text-dark">{{ cats['type'] | capitalize }}</span>
+                                        {% endif %}
+                                        {% if 'subject' in cats and cats['subject'] %}
+                                        <span class="badge bg-success text-white">{{ cats['subject'] | capitalize }}</span>
+                                        {% endif %}
+                                        {% if not ('type' in cats and cats['type']) and not ('subject' in cats and
+                                        cats['subject']) %}
+                                        <span class="text-muted fst-italic">Не указаны</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
                                 <!-- Описание -->
                                 {% if equipment.description %}
                                 <div class="description-section mt-4">
@@ -128,6 +148,7 @@
         </div>
     </div>
 </div>
+
 <!-- Модальное окно для заявки на ремонт -->
 <div class="modal fade" id="repairModal" tabindex="-1" aria-labelledby="repairModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -143,7 +164,6 @@
                         <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
                     </div>
 
-                    <!-- Опционально: выбор приоритета (если вы добавили колонку priority) -->
                     <div class="mb-3">
                         <label for="priority" class="form-label">Приоритет</label>
                         <select class="form-select" id="priority" name="priority">

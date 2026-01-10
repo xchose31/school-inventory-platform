@@ -45,6 +45,28 @@
                             </div>
                         </div>
 
+                        <!-- Новые поля: характер и предмет -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.equipment_type.label(class="form-label") }}
+                                    {{ form.equipment_type(class="form-select") }}
+                                    {% for error in form.equipment_type.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.subject.label(class="form-label") }}
+                                    {{ form.subject(class="form-select") }}
+                                    {% for error in form.subject.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-4">
                             {{ form.description.label(class="form-label") }}
                             {{ form.description(class="form-control", rows="4") }}
@@ -53,7 +75,7 @@
                             {% endfor %}
                         </div>
 
-                        <!-- Новое поле: загрузка изображения -->
+                        <!-- Поле загрузки изображения -->
                         <div class="mb-4">
                             {{ form.image.label(class="form-label") }}
                             {{ form.image(class="form-control") }}
@@ -61,7 +83,7 @@
                             <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
                             <div class="form-text text-muted">
-                                Поддерживаются форматы: JPG, JPEG, PNG, GIF. Максимальный размер — зависит от настроек сервера.
+                                Поддерживаются форматы: JPG, JPEG, PNG.
                             </div>
                         </div>
 
