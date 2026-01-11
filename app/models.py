@@ -140,7 +140,7 @@ class Equipment(Base):
     description = Column(String)
     is_deleted = Column(Boolean, default=False)
     photo_path = Column(String)
-    categories = Column(String)
+    categories = Column(String, default=json.dumps({"type": "", "subject": ""}))
 
     # Relationships
     materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")

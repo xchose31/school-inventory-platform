@@ -1,8 +1,8 @@
-import json
 import os.path
 from functools import wraps
+from sqlalchemy import or_, and_, func
+import json
 
-from unicodedata import category
 
 from .utils import save_file
 from app import app, db
@@ -86,8 +86,9 @@ def add_equipment():
             territory=form.territory.data,
             office=form.office.data,
             description=form.description.data,
-            categories=json.dumps({"type": form.equipment_type.data, "subject": form.subject.data})
+            categories=json.dumps({"type": form.equipment_type.data, "subject": form.subject.data}, ensure_ascii=False)
         )
+        print(form.equipment_type.data, form.subject.data)
         image = form.image.data
         save = save_file(image, 'equipment')
         if save:
@@ -260,3 +261,78 @@ def complete_repair_request(id):
         return redirect(url_for('repair_request_detail', id=id))
 
     return render_template('repair_request_detail.html', repair_request=req)
+
+
+
+
+@app.route('/equipment_filters')
+def equipment_filters():
+    query = request.args.get('q', '').strip()
+    type_filter = request.args.get('type', '').strip()
+    subject_filter = request.args.get('subject', '').strip()
+    territory = request.args.get('territory', '').strip()
+    office = request.args.get('office', '').strip()
+
+    stmt = db.select(Equipment).where(Equipment.is_deleted == False)
+
+    if query:
+        stmt = stmt.where(
+            or_(
+                Equipment.name.ilike(f'%{query}%'),
+                Equipment.description.ilike(f'%{query}%')
+            )
+        )
+
+    if type_filter:
+        stmt = stmt.where(
+            Equipment.categories.like(f'%"{type_filter}"%')
+        )
+
+    if subject_filter:
+        stmt = stmt.where(
+            Equipment.categories.like(f'%"{subject_filter}"%')
+        )
+
+    if territory:
+        stmt = stmt.where(Equipment.territory.ilike(f'%{territory}%'))
+
+    if office:
+        stmt = stmt.where(Equipment.office.ilike(f'%{office}%'))
+
+    equipments = db.session.execute(stmt).scalars().all()
+
+    all_equipments = db.session.execute(
+        db.select(Equipment).where(Equipment.is_deleted == False)
+    ).scalars().all()
+
+    types = set()
+    subjects = set()
+    territories = set()
+    offices = set()
+
+    for eq in all_equipments:
+        cat = eq.parsed_categories
+        if cat.get("type"):
+            types.add(cat["type"])
+        if cat.get("subject"):
+            subjects.add(cat["subject"])
+        if eq.territory:
+            territories.add(eq.territory)
+        if eq.office:
+            offices.add(eq.office)
+
+    return render_template(
+        'equipment_filters.html',
+        equipments=equipments,
+        types=sorted(types),
+        subjects=sorted(subjects),
+        territories=sorted(territories),
+        offices=sorted(offices),
+        current_filters={
+            'q': query,
+            'type': type_filter,
+            'subject': subject_filter,
+            'territory': territory,
+            'office': office
+        }
+    )

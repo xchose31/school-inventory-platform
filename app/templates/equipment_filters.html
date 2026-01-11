@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link href="{{ url_for('static', filename='css/equipment.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Форма фильтров -->
+  <form method="GET" class="mb-4 p-3 bg-light rounded">
+    <div class="row g-3 align-items-end">
+      <!-- Поиск -->
+      <div class="col-md-3">
+        <label for="q" class="form-label">Поиск</label>
+        <input type="text" class="form-control" id="q" name="q"
+               value="{{ current_filters.q or '' }}"
+               placeholder="Название или описание...">
+      </div>
+
+      <!-- Тип оборудования -->
+      <div class="col-md-2">
+        <label for="type" class="form-label">Тип</label>
+        <select class="form-select" id="type" name="type">
+          <option value="">Все</option>
+          {% for t in types %}
+            <option value="{{ t }}" {% if t == current_filters.type %}selected{% endif %}>
+              {{ t }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Предмет -->
+      <div class="col-md-2">
+        <label for="subject" class="form-label">Предмет</label>
+        <select class="form-select" id="subject" name="subject">
+          <option value="">Все</option>
+          {% for s in subjects %}
+            <option value="{{ s }}" {% if s == current_filters.subject %}selected{% endif %}>
+              {{ s }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Территория -->
+      <div class="col-md-2">
+        <label for="territory" class="form-label">Территория</label>
+        <select class="form-select" id="territory" name="territory">
+          <option value="">Все</option>
+          {% for t in territories %}
+            <option value="{{ t }}" {% if t == current_filters.territory %}selected{% endif %}>
+              {{ t }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Кабинет -->
+      <div class="col-md-2">
+        <label for="office" class="form-label">Кабинет</label>
+        <select class="form-select" id="office" name="office">
+          <option value="">Все</option>
+          {% for o in offices %}
+            <option value="{{ o }}" {% if o == current_filters.office %}selected{% endif %}>
+              {{ o }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Кнопки -->
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Применить</button>
+      </div>
+    </div>
+    <div class="mt-2">
+      <a href="{{ url_for('equipment_filters') }}" class="btn btn-sm btn-outline-secondary">
+        Сбросить фильтры
+      </a>
+    </div>
+  </form>
+
+  <!-- Результаты -->
+  {% if equipments %}
+    <div class="row g-3">
+      {% for eq in equipments %}
+        <div class="col-12">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ eq.name }}</h5>
+                <span class="badge bg-primary">{{ eq.parsed_categories.get('type') or '—' }}</span>
+              </div>
+              <p class="text-muted small mb-2">
+                {% if eq.parsed_categories.get('subject') %}
+                  <i class="fas fa-book me-1"></i>{{ eq.parsed_categories.subject }}
+                {% endif %}
+              </p>
+              <p>{{ eq.description or 'Без описания' }}</p>
+              <div class="text-muted small">
+                {% if eq.territory %}{{ eq.territory }}, {% endif %}
+                каб. {{ eq.office or 'не указан' }}
+              </div>
+              <a href="{{ url_for('equipment', id=eq.id) }}" class="btn btn-sm btn-outline-primary mt-2">
+                Подробнее
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center">
+      Оборудование не найдено.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

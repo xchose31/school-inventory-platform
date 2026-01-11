@@ -39,9 +39,15 @@
                                 <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
                             </ul>
                         </li>
+                        {% set roles = check_roles() %}
+                        {% if "teacher" in roles or "technician" in roles %}
                         <li class="nav-item">
                             <a class="nav-link" href="/add_equipment">Добавить оборудование</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/equipment_filters">Поиск</a>
+                        </li>
+                        {% endif %}
                         {% endif %}
                     </ul>
                 </div>
