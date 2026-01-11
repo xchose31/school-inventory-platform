@@ -62,8 +62,12 @@ def login():
                     flash('Invalid username or password')
                     return redirect(url_for('login'))
             else:
-                login_user(user, remember=form.remember_me.data)
-                return redirect(url_for('index'))
+                if form.password.data == 'password':
+                    login_user(user, remember=form.remember_me.data)
+                    return redirect(url_for('index'))
+                else:
+                    flash('Invalid username or password')
+                    return redirect(url_for('login'))
         flash('Invalid username or password')
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
