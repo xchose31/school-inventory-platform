@@ -3,14 +3,13 @@ from functools import wraps
 from sqlalchemy import or_, and_, func
 import json
 
-
 from .utils import save_file
 from app import app, db
-from flask import render_template, flash, redirect, url_for, abort, request, send_file
+from flask import render_template, flash, redirect, url_for, abort, request, send_file, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, EquipmentForm
 import sqlalchemy as sa
-from app.models import User, Equipment, ComPerson, RepairRequest
+from app.models import User, Equipment, RepairRequest, Material
 from app.qr import generate_qr_code
 import requests
 
@@ -111,7 +110,8 @@ def equipment(id):
         .filter(RepairRequest.equipment_id == equipment.id) \
         .order_by(RepairRequest.is_completed.asc(), RepairRequest.creation_date.desc()) \
         .all()
-    return render_template('equipment.html', equipment=equipment, repair_requests=repair_requests)
+    materials = equipment.materials
+    return render_template('equipment.html', equipment=equipment, repair_requests=repair_requests, materials=materials)
 
 
 @app.route('/equipment/<int:id>/delete', methods=['GET', 'POST'])
@@ -174,17 +174,43 @@ def equipment_qr(id):
     return send_file(path, mimetype='image/png')
 
 
-@app.route('/equipment/<int:id>/add_material')
+@app.route('/equipment/<int:id>/add_material', methods=['GET', 'POST'])
 @user_is_employer()
 def add_material(id):
-    pass
+    title = request.form.get('title', '').strip()
+    file = request.files.get('file')
+    is_public = request.form.get('is_public') == 'on'
+    sv = save_file(file, 'material')
+    if sv:
+        material = Material(
+            title=title,
+            filepath=sv,
+            file_type=sv.split('.')[-1],
+            is_public=is_public,
+            equipment_id=id
+        )
+        db.session.add(material)
+        db.session.commit()
+        return redirect(url_for(f'equipment', id=id))
+    flash('Произошла ошибка при сохранении материала', 'error')
+    return redirect(url_for(f'equipment', id=id))
+
+
+@app.route('/material/<int:material_id>/download')
+def download_material(material_id):
+    material = Material.query.get_or_404(int(material_id))
+    upload_folder = os.path.join('app', 'static', 'uploads', 'materials')
+    if not material.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    upload_folder = os.path.join('app', 'static', 'uploads', 'materials')
+    return send_from_directory(upload_folder, material.filepath, as_attachment=False)
 
 
 @app.route('/equipment/<int:id>/request_repair', methods=['GET', 'POST'])
 @user_is_employer()
 def create_repair_request(id):
     comment = request.form.get('comment', '').strip()
-    priority = request.form.get('priority', 'средний')
     current_repair_requests = db.session.query(RepairRequest).filter(RepairRequest.is_completed == False).all()
     if current_repair_requests:
         flash('У этого оборудования уже есть невыполненная заявка на ремонт!', 'error')
@@ -192,7 +218,6 @@ def create_repair_request(id):
     repair_request = RepairRequest(
         equipment_id=id,
         comment=comment,
-        priority=priority,
         user_id=current_user.id
     )
     db.session.add(repair_request)
@@ -265,7 +290,6 @@ def complete_repair_request(id):
         return redirect(url_for('repair_request_detail', id=id))
 
     return render_template('repair_request_detail.html', repair_request=req)
-
 
 
 @app.route('/equipment_filters')

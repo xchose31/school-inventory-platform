@@ -26,7 +26,6 @@ class ComPerson(Base):
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
                         onupdate=func.current_timestamp())
 
-    # Relationships
     emp_status = relationship("EmpStatus", back_populates="person", uselist=False)
     users = relationship("User", back_populates="person")
 
@@ -45,7 +44,6 @@ class EmpStatus(Base):
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
                         onupdate=func.current_timestamp())
 
-    # Relationships
     person = relationship("ComPerson", back_populates="emp_status")
 
     @property
@@ -54,53 +52,11 @@ class EmpStatus(Base):
 
 
 
-class StuClass(Base):
-    __tablename__ = 'stu_classes'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    last_year = Column(SmallInteger)
-    letter = Column(String(4))
-    bldg_id = Column(Integer)
-
-    # Relationships
-    students = relationship("StuStudent", back_populates="class_")
-    classteachers = relationship("StuClassteacher", back_populates="class_")
-
-
-class StuClassteacher(Base):
-    __tablename__ = 'stu_classteachers'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    pers_id = Column(Integer, ForeignKey('com_persons.id', ondelete='CASCADE'))
-    class_id = Column(Integer, ForeignKey('stu_classes.id', ondelete='CASCADE'))
-
-    # Relationships
-    person = relationship("ComPerson", back_populates="classteachers")
-    class_ = relationship("StuClass", back_populates="classteachers")
-
-
-class StuStudent(Base):
-    __tablename__ = 'stu_students'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    pers_id = Column(Integer, ForeignKey('com_persons.id', ondelete='CASCADE'))
-    class_id = Column(Integer, ForeignKey('stu_classes.id', ondelete='SET NULL'))
-    date_to = Column(Date)
-    created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
-                        onupdate=func.current_timestamp())
-
-    # Relationships
-    person = relationship("ComPerson", back_populates="students")
-    class_ = relationship("StuClass", back_populates="students")
-
-
 class User(Base, UserMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(64), unique=True)
-    open_password = Column(String(255))
     password = Column(String(255))
     pers_id = Column(Integer, ForeignKey('com_persons.id', ondelete='SET NULL'))
     is_alias = Column(Integer, default=0)
@@ -108,10 +64,6 @@ class User(Base, UserMixin):
     updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(),
                         onupdate=func.current_timestamp())
 
-    def check_password(self, password):
-        return bcrypt.verify(password + self.open_password, self.password)
-
-    # Relationships
     person = relationship("ComPerson", back_populates="users")
     repair_requests = relationship('RepairRequest', back_populates='user')
 
@@ -140,7 +92,6 @@ class Equipment(Base):
     photo_path = Column(String)
     categories = Column(String, default=json.dumps({"type": "", "subject": ""}))
 
-    # Relationships
     materials = relationship("Material", back_populates="equipment", cascade="all, delete-orphan")
     repair_requests = relationship('RepairRequest', back_populates='equipment')
 
@@ -158,7 +109,6 @@ class RepairRequest(Base):
     equipment_id = Column(Integer, ForeignKey('equipments.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     comment = Column(String())
-    priority = Column(String, default='средний')
     is_completed = Column(Boolean, default=False)
     completion_comment = Column(String)
     creation_date = Column(TIMESTAMP, server_default=func.current_timestamp())

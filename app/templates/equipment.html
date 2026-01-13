@@ -35,11 +35,11 @@
                                 <i class="fas fa-wrench me-1"></i> Ремонт
                             </button>
                             <!-- Кнопка "Материалы" -->
-<button type="button" class="btn btn-secondary btn-sm d-flex align-items-center"
-        data-bs-toggle="modal"
-        data-bs-target="#materialsModal">
-    <i class="fas fa-paperclip me-1"></i> Материалы
-</button>
+                            <button type="button" class="btn btn-secondary btn-sm d-flex align-items-center"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#materialsModal">
+                                <i class="fas fa-paperclip me-1"></i> Материалы
+                            </button>
                             <!-- Кнопка Dropdown -->
                             <div class="dropdown">
                                 <button class="btn btn-light btn-sm dropdown-toggle" type="button"
@@ -170,15 +170,6 @@
                         <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Приоритет</label>
-                        <select class="form-select" id="priority" name="priority">
-                            <option value="low">Низкий</option>
-                            <option value="medium" selected>Средний</option>
-                            <option value="high">Высокий</option>
-                            <option value="critical">Критический</option>
-                        </select>
-                    </div>
 
                     <button type="submit" class="btn btn-primary">Отправить заявку</button>
                 </form>
@@ -189,32 +180,35 @@
 
 <!-- Модальное окно для прикрепления материалов -->
 <div class="modal fade" id="materialsModal" tabindex="-1" aria-labelledby="materialsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="materialsModalLabel">Прикрепить материал</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-      </div>
-      <div class="modal-body">
-        <form method="POST" action="{{ url_for('add_material', id=equipment.id) }}" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label for="title" class="form-label">Название материала</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-          </div>
-          <div class="mb-3">
-            <label for="file" class="form-label">Файл</label>
-            <input class="form-control" type="file" id="file" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.png" required>
-            <div class="form-text">Поддерживаются: PDF, DOC(X), TXT, JPG, PNG.</div>
-          </div>
-          <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
-            <label class="form-check-label" for="is_public">Доступен всем (уберите, если хотите защитить материал авторским правом и сделать его доступным только для обучающихся)</label>
-          </div>
-          <button type="submit" class="btn btn-primary">Загрузить</button>
-        </form>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="materialsModalLabel">Прикрепить материал</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('add_material', id=equipment.id) }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название материала</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Файл</label>
+                        <input class="form-control" type="file" id="file" name="file"
+                               accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.jpg,.png" required>
+                        <div class="form-text">Поддерживаются: PDF, PPT(X), DOC(X), TXT, JPG, PNG.</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
+                        <label class="form-check-label" for="is_public">Доступен всем (уберите, если хотите защитить
+                            материал авторским правом и сделать его доступным только для обучающихся)</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 {% if repair_requests and ('teacher' in check_roles() or 'technician' in check_roles()) %}
 <div class="container py-4">
@@ -228,6 +222,42 @@
                 </div>
                 <div class="card-body p-0">
                     {% include 'partials/repair_requests_list.html' with context %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if materials %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light py-3 text-center">
+                    <h2 class="h5 mb-0 text-primary">
+                        <i class="fas fa-paperclip me-2"></i>Прикреплённые материалы
+                    </h2>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for mat in materials %}
+                        {% if mat.is_public or current_user.is_authenticated %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-alt me-2 text-muted"></i>
+                                <a href="{{ url_for('download_material', material_id=mat.id) }}"
+                                   target="_blank"
+                                   class="text-decoration-none">
+                                    {{ mat.title or mat.filepath }}
+                                </a>
+                                {% if not mat.is_public %}
+                                <span class="badge bg-warning text-dark ms-2">Приватный</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>

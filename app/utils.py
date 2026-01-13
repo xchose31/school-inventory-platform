@@ -3,7 +3,7 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'ppt', 'pptx', 'doc', 'docx', 'txt'}
 
 
 def check_roles():
@@ -28,7 +28,10 @@ def save_file(file, type):
         upload_folder = ''
         if type == 'equipment':
             upload_folder = os.path.join('app', 'static', 'uploads', 'equipment')
-
+        elif type == 'material':
+            upload_folder = os.path.join('app', 'static', 'uploads', 'materials')
+        if not upload_folder:
+            return None
         filename = secure_filename(file.filename)
 
         ext = filename.rsplit('.', 1)[1].lower()
