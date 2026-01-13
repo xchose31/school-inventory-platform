@@ -34,6 +34,12 @@
                                     data-bs-target="#repairModal">
                                 <i class="fas fa-wrench me-1"></i> Ремонт
                             </button>
+                            <!-- Кнопка "Материалы" -->
+<button type="button" class="btn btn-secondary btn-sm d-flex align-items-center"
+        data-bs-toggle="modal"
+        data-bs-target="#materialsModal">
+    <i class="fas fa-paperclip me-1"></i> Материалы
+</button>
                             <!-- Кнопка Dropdown -->
                             <div class="dropdown">
                                 <button class="btn btn-light btn-sm dropdown-toggle" type="button"
@@ -181,6 +187,35 @@
     </div>
 </div>
 
+<!-- Модальное окно для прикрепления материалов -->
+<div class="modal fade" id="materialsModal" tabindex="-1" aria-labelledby="materialsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="materialsModalLabel">Прикрепить материал</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('add_material', id=equipment.id) }}" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="title" class="form-label">Название материала</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="file" class="form-label">Файл</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.png" required>
+            <div class="form-text">Поддерживаются: PDF, DOC(X), TXT, JPG, PNG.</div>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
+            <label class="form-check-label" for="is_public">Доступен всем (уберите, если хотите защитить материал авторским правом и сделать его доступным только для обучающихся)</label>
+          </div>
+          <button type="submit" class="btn btn-primary">Загрузить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% if repair_requests and ('teacher' in check_roles() or 'technician' in check_roles()) %}
 <div class="container py-4">
     <div class="row justify-content-center">

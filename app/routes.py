@@ -268,8 +268,8 @@ def complete_repair_request(id):
 
 
 
-
 @app.route('/equipment_filters')
+@user_is_employer()
 def equipment_filters():
     query = request.args.get('q', '').strip()
     type_filter = request.args.get('type', '').strip()
