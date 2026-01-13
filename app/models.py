@@ -28,8 +28,6 @@ class ComPerson(Base):
 
     # Relationships
     emp_status = relationship("EmpStatus", back_populates="person", uselist=False)
-    students = relationship("StuStudent", back_populates="person")
-    classteachers = relationship("StuClassteacher", back_populates="person")
     users = relationship("User", back_populates="person")
 
     def __repr__(self):
