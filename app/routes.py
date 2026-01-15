@@ -124,6 +124,15 @@ def delete_equipment(id):
     return redirect(url_for('index'))
 
 
+@app.route('/equipment/<int:id>/recover')
+@user_is_employer()
+def recover_equipment(id):
+    equipment = Equipment.query.get_or_404(id)
+    equipment.is_deleted = False
+    db.session.commit()
+    flash('Оборудование успешно востановлено', 'success')
+    return redirect(url_for('equipment_list'))
+
 @app.route('/equipment/<int:id>/edit', methods=['GET', 'POST'])
 @user_is_employer()
 def edit_equipment(id):
@@ -160,7 +169,8 @@ def edit_equipment(id):
 @user_is_employer()
 def equipment_list():
     equipments = Equipment.query.filter(Equipment.is_deleted == False).all()
-    return render_template('equipment_list2.html', equipments=equipments)
+    deleted_equipments = Equipment.query.filter(Equipment.is_deleted == True).all()
+    return render_template('equipment_list.html', equipments=equipments, deleted_equipments=deleted_equipments)
 
 
 @app.route('/equipment/<int:id>/qr')
@@ -232,16 +242,8 @@ def create_repair_request(id):
 def repair_requests_list():
     if not current_user.person.emp_status.is_technician:
         abort(403)
-    priority_order = sa.case(
-        (RepairRequest.priority == 'критический', 1),
-        (RepairRequest.priority == 'высокий', 2),
-        (RepairRequest.priority == 'средний', 3),
-        (RepairRequest.priority == 'низкий', 4),
-        else_=5
-    )
     repair_requests = db.session.query(RepairRequest).join(RepairRequest.equipment).order_by(
         RepairRequest.is_completed.asc(),
-        priority_order.asc(),
         RepairRequest.creation_date.desc()
     ).all()
 
