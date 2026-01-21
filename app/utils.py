@@ -20,7 +20,7 @@ def check_roles():
 
 def allowed_file(filename):
     return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.split('.')[-1].lower() in ALLOWED_EXTENSIONS
 
 
 def save_file(file, type):
@@ -34,7 +34,7 @@ def save_file(file, type):
             return None
         filename = secure_filename(file.filename)
 
-        ext = filename.rsplit('.', 1)[1].lower()
+        ext = filename.split('.')[-1].lower()
         unique_filename = f"{uuid.uuid4().hex}.{ext}"
 
         os.makedirs(upload_folder, exist_ok=True)

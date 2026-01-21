@@ -42,23 +42,7 @@
         </p>
       </div>
 
-      <!-- Приоритет -->
       <div class="row mb-4">
-        <div class="col-md-6">
-          <h6 class="text-secondary">Приоритет</h6>
-          {% set prio = repair_request.priority %}
-          {% if prio == 'критический' %}
-            <span class="badge bg-danger">Критический</span>
-          {% elif prio == 'высокий' %}
-            <span class="badge bg-orange text-dark">Высокий</span>
-          {% elif prio == 'средний' %}
-            <span class="badge bg-warning text-dark">Средний</span>
-          {% elif prio == 'низкий' %}
-            <span class="badge bg-success">Низкий</span>
-          {% else %}
-            <span class="badge bg-secondary">Не задан</span>
-          {% endif %}
-        </div>
         <div class="col-md-6">
           <h6 class="text-secondary">Дата создания</h6>
           <p class="mb-0">{{ repair_request.creation_date.strftime('%d.%m.%Y %H:%M') }}</p>

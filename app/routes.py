@@ -184,7 +184,7 @@ def equipment_qr(id):
     return send_file(path, mimetype='image/png')
 
 
-@app.route('/equipment/<int:id>/add_material', methods=['GET', 'POST'])
+@app.route('/equipment/<int:id>/add_material', methods=['POST'])
 @user_is_employer()
 def add_material(id):
     title = request.form.get('title', '').strip()
@@ -209,12 +209,11 @@ def add_material(id):
 @app.route('/material/<int:material_id>/download')
 def download_material(material_id):
     material = Material.query.get_or_404(int(material_id))
-    upload_folder = os.path.join('app', 'static', 'uploads', 'materials')
     if not material.is_public and not current_user.is_authenticated:
         abort(403)
 
-    upload_folder = os.path.join('app', 'static', 'uploads', 'materials')
-    return send_from_directory(upload_folder, material.filepath, as_attachment=False)
+    upload_folder = os.path.join('static', 'uploads', 'materials')
+    return send_file(upload_folder + "\\" + material.filepath)
 
 
 @app.route('/equipment/<int:id>/request_repair', methods=['GET', 'POST'])

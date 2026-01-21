@@ -23,20 +23,6 @@
                 <span class="badge bg-warning text-dark rounded-pill px-3 py-2">⏳ В работе</span>
               {% endif %}
 
-              <!-- Приоритет (с вашими русскими значениями) -->
-              {% if req.priority %}
-                <div class="mt-3">
-                  {% if req.priority == 'критический' %}
-                    <span class="badge bg-danger">Критический</span>
-                  {% elif req.priority == 'высокий' %}
-                    <span class="badge bg-orange text-dark">Высокий</span>
-                  {% elif req.priority == 'средний' %}
-                    <span class="badge bg-warning text-dark">Средний</span>
-                  {% elif req.priority == 'низкий' %}
-                    <span class="badge bg-success">Низкий</span>
-                  {% endif %}
-                </div>
-              {% endif %}
             </div>
 
             <!-- Основная информация -->

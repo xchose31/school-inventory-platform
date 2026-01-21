@@ -7,7 +7,6 @@ from app.utils import check_roles
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.secret_key = app.config['SECRET_KEY']
 app.jinja_env.globals['check_roles'] = check_roles
 login = LoginManager(app)
 db = SQLAlchemy(app)
