@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block styles %}
+<link href="{{ url_for('static', filename='css/equipment.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container equipment-form-container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card equipment-card shadow">
+                <div class="card-header">
+                    <h1 class="card-title h4 mb-0">Добавить оборудование</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Добавлен атрибут enctype для загрузки файлов -->
+                    <form action="" method="post" enctype="multipart/form-data" novalidate class="equipment-form">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-4">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control form-control-lg") }}
+                            {% for error in form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.territory.label(class="form-label") }}
+                                    {{ form.territory(class="form-select") }}
+                                    {% for error in form.territory.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.office.label(class="form-label") }}
+                                    {{ form.office(class="form-select") }}
+                                    {% for error in form.office.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Новые поля: характер и предмет -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.equipment_type.label(class="form-label") }}
+                                    {{ form.equipment_type(class="form-select") }}
+                                    {% for error in form.equipment_type.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form.subject.label(class="form-label") }}
+                                    {{ form.subject(class="form-select") }}
+                                    {% for error in form.subject.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="4") }}
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Поле загрузки изображения -->
+                        <div class="mb-4">
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control") }}
+                            {% for error in form.image.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text text-muted">
+                                Поддерживаются форматы: JPG, JPEG, PNG.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            {{ form.submit(class="btn btn-submit text-white") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

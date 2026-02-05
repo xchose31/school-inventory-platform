@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link href="{{ url_for('static', filename='css/equipment.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Главная</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('repair_requests_list') }}" class="text-decoration-none">Заявки на ремонт</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Заявка #{{ repair_request.id }}</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h1 class="h4 mb-0">
+        <i class="fas fa-tools me-2"></i>Заявка на ремонт #{{ repair_request.id }}
+      </h1>
+      {% if repair_request.is_completed %}
+        <span class="badge bg-success fs-6">Выполнено</span>
+      {% else %}
+        <span class="badge bg-warning text-dark fs-6">В работе</span>
+      {% endif %}
+    </div>
+
+    <div class="card-body">
+      <!-- Оборудование -->
+      <div class="mb-4">
+        <h5 class="text-primary">Оборудование</h5>
+        <p>
+          <a href="{{ url_for('equipment', id=repair_request.equipment.id) }}" class="text-decoration-none fw-bold">
+            {{ repair_request.equipment.name }}
+          </a>
+          (ID: {{ repair_request.equipment.id }})
+        </p>
+        <p class="text-muted mb-0">
+          {% if repair_request.equipment.territory %}{{ repair_request.equipment.territory }}, {% endif %}
+          {{ repair_request.equipment.office or 'офис не указан' }}
+        </p>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <h6 class="text-secondary">Дата создания</h6>
+          <p class="mb-0">{{ repair_request.creation_date.strftime('%d.%m.%Y %H:%M') }}</p>
+        </div>
+      </div>
+
+      <!-- Комментарий от пользователя -->
+      <div class="mb-4">
+        <h6 class="text-secondary">Описание неисправности</h6>
+        <div class="p-3 bg-light rounded">
+          {{ repair_request.comment or '<em>Без комментария</em>' | safe }}
+        </div>
+      </div>
+
+      <!-- Комментарий от техника (если выполнен) -->
+      {% if repair_request.is_completed %}
+        <div class="mb-4">
+          <h6 class="text-secondary">Комментарий техника</h6>
+          {% if repair_request.completion_comment %}
+            <div class="p-3 bg-light rounded border-start border-success">
+              {{ repair_request.completion_comment }}
+            </div>
+          {% else %}
+            <p class="text-muted"><em>Без комментария</em></p>
+          {% endif %}
+          {% if repair_request.completion_date %}
+            <p class="text-muted small mt-2">Выполнено: {{ repair_request.completion_date.strftime('%d.%m.%Y %H:%M') }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Форма завершения (только для техника и если не выполнено) -->
+      {% if not repair_request.is_completed and 
+           current_user.is_authenticated and 
+           current_user.person.emp_status.is_technician %}
+        <hr class="my-4">
+        <h5 class="text-primary mb-3">Завершить ремонт</h5>
+        <form method="POST">
+          <div class="mb-3">
+            <label for="completion_comment" class="form-label">Комментарий к выполнению (опционально)</label>
+            <textarea 
+              class="form-control" 
+              id="completion_comment" 
+              name="completion_comment" 
+              rows="3"
+              placeholder="Например: заменил блок питания, всё работает"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-success" onclick="return confirm('Отметить заявку как выполненную?')">
+            <i class="fas fa-check-circle me-1"></i>Подтвердить выполнение
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="mt-3 text-center">
+    <a href="{{ url_for('repair_requests_list') }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i>К списку заявок
+    </a>
+  </div>
+</div>
+{% endblock %}

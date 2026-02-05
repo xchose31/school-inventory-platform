@@ -1,0 +1,71 @@
+{# partials/repair_requests_list.html — точная копия списка из repair_requests.html #}
+
+{% if not repair_requests %}
+  <div class="alert alert-info text-center">
+    <i class="fas fa-check-circle me-2"></i>Нет заявок на ремонт.
+  </div>
+{% else %}
+  <div class="row g-3">
+    {% for req in repair_requests %}
+      <div class="col-12">
+        <div class="card border-0 shadow-sm h-100 {% if req.is_completed %}bg-light{% endif %}">
+          <div class="card-body d-flex flex-column flex-md-row">
+            <!-- Левая колонка: статус и приоритет -->
+            <div class="text-center me-md-4 mb-3 mb-md-0" style="min-width: 80px;">
+              {% if req.is_completed %}
+                <span class="badge bg-success rounded-pill px-3 py-2">✅ Выполнено</span>
+                {% if req.completion_date %}
+                  <div class="mt-2 small text-muted">
+                    {{ req.completion_date.strftime('%d.%m.%Y') }}
+                  </div>
+                {% endif %}
+              {% else %}
+                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">⏳ В работе</span>
+              {% endif %}
+
+            </div>
+
+            <!-- Основная информация -->
+            <div class="flex-grow-1">
+              <h5 class="card-title">
+                <a href="{{ url_for('repair_request_detail', id=req.id) }}" class="text-decoration-none">
+                  {{ req.equipment.name }}
+                </a>
+                <small class="text-muted">#{{ req.id }}</small>
+              </h5>
+
+              <p class="card-text mt-2 mb-1">
+                <i class="fas fa-comment me-1 text-muted"></i>
+                {{ req.comment or 'Без комментария' }}
+              </p>
+
+              <div class="text-muted small mt-2">
+                <i class="fas fa-calendar me-1"></i>
+                Создано: {{ req.creation_date.strftime('%d.%m.%Y %H:%M') }}
+                {% if req.equipment.territory or req.equipment.office %}
+                  •
+                  {% if req.equipment.territory %}{{ req.equipment.territory }}, {% endif %}
+                  {{ req.equipment.office or 'офис не указан' }}
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Кнопки действий (только для техника и только если не выполнено) -->
+            {% if current_user.is_authenticated and current_user.person.emp_status.is_technician %}
+              <div class="d-flex flex-column justify-content-start ms-md-3" style="min-width: 120px;">
+                {% if not req.is_completed %}
+                  <form method="POST" action="{{ url_for('complete_repair_request', id=req.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-success mb-2"
+                            onclick="return confirm('Отметить заявку как выполненную?')">
+                      <i class="fas fa-check me-1"></i>Готово
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
