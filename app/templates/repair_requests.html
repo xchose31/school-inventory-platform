@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block styles %}
+<link href="{{ url_for('static', filename='css/equipment.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 text-primary">
+      <i class="fas fa-tools me-2"></i>Заявки на ремонт
+    </h1>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left me-1"></i>Назад
+    </a>
+  </div>
+
+  {% include 'partials/repair_requests_list.html' with context %}
+</div>
+{% endblock %}

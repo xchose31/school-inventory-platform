@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Список оборудования</h1>
+
+        <!-- Галочка для показа удалённого -->
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="showDeletedToggle">
+            <label class="form-check-label" for="showDeletedToggle">
+                Показать удалённое оборудование
+            </label>
+        </div>
+    </div>
+
+    <!-- Таблица активного оборудования -->
+    <div id="activeEquipmentTable">
+        {% if equipments %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Корпус</th>
+                    <th scope="col">Кабинет</th>
+                    <th scope="col">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipment in equipments %}
+                <tr>
+                    <th scope="row">{{ equipment.id }}</th>
+                    <td>
+                        <a href="{{ url_for('equipment', id=equipment.id) }}" class="text-decoration-none">
+                            {{ equipment.name }}
+                        </a>
+                    </td>
+                    <td>{{ equipment.territory or '—' }}</td>
+                    <td>{{ equipment.office or '—' }}</td>
+                    <td>
+                        {% if check_roles() %}
+                        <a href="{{ url_for('edit_equipment', id=equipment.id) }}" class="btn btn-warning btn-sm">Изменить</a>
+                        {% else %}
+                        <p>У вас нет доступных действий</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">Активное оборудование отсутствует.</div>
+        {% endif %}
+    </div>
+
+    <!-- Таблица удалённого оборудования (изначально скрыта) -->
+    <div id="deletedEquipmentTable" style="display: none;">
+        <h2 class="h4 mb-3 text-danger">Удалённое оборудование</h2>
+        {% if deleted_equipments %}
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Корпус</th>
+                    <th scope="col">Кабинет</th>
+                    <th scope="col">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipment in deleted_equipments %}
+                <tr>
+                    <th scope="row">{{ equipment.id }}</th>
+                    <td>
+                        <a href="{{ url_for('equipment', id=equipment.id) }}" class="text-decoration-none">
+                            {{ equipment.name }}
+                        </a>
+                    </td>
+                    <td>{{ equipment.territory or '—' }}</td>
+                    <td>{{ equipment.office or '—' }}</td>
+                    <td>
+                        {% if check_roles() %}
+                         <a href="{{ url_for('recover_equipment', id=equipment.id) }}" class="btn btn-success btn-sm">Восстановить</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">Удалённое оборудование отсутствует.</div>
+        {% endif %}
+    </div>
+
+    {% if check_roles() %}
+    <a href="{{ url_for('add_equipment') }}" class="btn btn-primary mt-3">Добавить оборудование</a>
+    {% endif %}
+</div>
+
+<!-- JavaScript для переключения видимости -->
+<script>
+document.getElementById('showDeletedToggle').addEventListener('change', function() {
+    const deletedTable = document.getElementById('deletedEquipmentTable');
+    if (this.checked) {
+        deletedTable.style.display = 'block';
+    } else {
+        deletedTable.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

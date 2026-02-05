@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block styles %}
+<link href="{{ url_for('static', filename='css/equipment.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container equipment-detail-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}"
+                                                   class="text-decoration-none">Главная</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ equipment.name }}</li>
+                </ol>
+            </nav>
+
+            <!-- Карточка оборудования -->
+            <div class="card equipment-detail-card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="card-title h3 mb-0">
+                            <i class="fas fa-desktop me-2"></i>{{ equipment.name }}
+                        </h1>
+                        {% if check_roles() %}
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ url_for('equipment_qr', id=equipment.id) }}"
+                               class="btn btn-info btn-sm d-flex align-items-center"
+                               title="QR-код">
+                                <i class="fas fa-qrcode me-1"></i> QR
+                            </a>
+                            <button type="button" class="btn btn-warning btn-sm d-flex align-items-center"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#repairModal">
+                                <i class="fas fa-wrench me-1"></i> Ремонт
+                            </button>
+                            <!-- Кнопка "Материалы" -->
+                            <button type="button" class="btn btn-secondary btn-sm d-flex align-items-center"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#materialsModal">
+                                <i class="fas fa-paperclip me-1"></i> Материалы
+                            </button>
+                            <!-- Кнопка Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form action="{{ url_for('edit_equipment', id=equipment.id) }}" method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-edit me-2"></i>Изменить оборудование
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form action="{{ url_for('delete_equipment', id=equipment.id) }}" method="post"
+                                              class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить это оборудование? Это действие нельзя отменить.')">
+                                                <i class="fas fa-trash me-2"></i>Удалить оборудование
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Основная информация -->
+                        <div class="col-md-8">
+                            <div class="equipment-info">
+                                <h3 class="h5 mb-4 text-primary">Основная информация</h3>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-map-marker-alt me-2 text-muted"></i>Территория:
+                                        </div>
+                                        <div class="info-value">{{ equipment.territory or 'Не указана' }}</div>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-building me-2 text-muted"></i>Кабинет:
+                                        </div>
+                                        <div class="info-value">{{ equipment.office or 'Не указан' }}</div>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-id-card me-2 text-muted"></i>ID оборудования:
+                                        </div>
+                                        <div class="info-value">#{{ equipment.id }}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Секция категорий — надёжная версия -->
+                                {% set cats = equipment.parsed_categories %}
+                                <div class="categories-section mt-4 p-3 bg-light rounded border">
+                                    <h4 class="h6 mb-3 text-primary d-flex align-items-center">
+                                        <i class="fas fa-layer-group me-2"></i>Категории оборудования
+                                    </h4>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if 'type' in cats and cats['type'] %}
+                                        <span class="badge bg-info text-dark">{{ cats['type'] | capitalize }}</span>
+                                        {% endif %}
+                                        {% if 'subject' in cats and cats['subject'] %}
+                                        <span class="badge bg-success text-white">{{ cats['subject'] | capitalize }}</span>
+                                        {% endif %}
+                                        {% if not ('type' in cats and cats['type']) and not ('subject' in cats and
+                                        cats['subject']) %}
+                                        <span class="text-muted fst-italic">Не указаны</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Описание -->
+                                {% if equipment.description %}
+                                <div class="description-section mt-4">
+                                    <h4 class="h6 mb-3 text-primary">Описание</h4>
+                                    <div class="description-content p-3 bg-light rounded">
+                                        {{ equipment.description }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column align-items-center justify-content-start mt-4 mt-md-0">
+                            {% if equipment.photo_path %}
+                            <img src="{{ url_for('static', filename='uploads/equipment/' + equipment.photo_path) }}"
+                                 alt="Фото {{ equipment.name }}"
+                                 class="img-fluid rounded border shadow-sm"
+                                 style="max-height: 300px; object-fit: contain;">
+                            {% else %}
+                            <div class="text-muted text-center"
+                                 style="max-height: 300px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image fa-3x"></i>
+                                <p class="mt-2 mb-0">Нет изображения</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для заявки на ремонт -->
+<div class="modal fade" id="repairModal" tabindex="-1" aria-labelledby="repairModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="repairModalLabel">Новая заявка на ремонт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="repairForm" method="POST" action="{{ url_for('create_repair_request', id=equipment.id) }}">
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Комментарий к неисправности</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Отправить заявку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для прикрепления материалов -->
+<div class="modal fade" id="materialsModal" tabindex="-1" aria-labelledby="materialsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="materialsModalLabel">Прикрепить материал</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('add_material', id=equipment.id) }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название материала</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Файл</label>
+                        <input class="form-control" type="file" id="file" name="file"
+                               accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.jpg,.png" required>
+                        <div class="form-text">Поддерживаются: PDF, PPT(X), DOC(X), TXT, JPG, PNG.</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_public" name="is_public" checked>
+                        <label class="form-check-label" for="is_public">Доступен всем (уберите, если хотите защитить
+                            материал авторским правом и сделать его доступным только для обучающихся)</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% if repair_requests and ('teacher' in check_roles() or 'technician' in check_roles()) %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light py-3">
+                    <h2 class="h5 mb-0 text-primary">
+                        <i class="fas fa-tools me-2"></i>Заявки на ремонт
+                    </h2>
+                </div>
+                <div class="card-body p-0">
+                    {% include 'partials/repair_requests_list.html' with context %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if materials %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light py-3 text-center">
+                    <h2 class="h5 mb-0 text-primary">
+                        <i class="fas fa-paperclip me-2"></i>Прикреплённые материалы
+                    </h2>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for mat in materials %}
+                        {% if mat.is_public or current_user.is_authenticated %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-alt me-2 text-muted"></i>
+                                <a href="{{ url_for('download_material', material_id=mat.id) }}"
+                                   target="_blank"
+                                   class="text-decoration-none">
+                                    {{ mat.title or mat.filepath }}
+                                </a>
+                                {% if not mat.is_public %}
+                                <span class="badge bg-warning text-dark ms-2">Приватный</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+/* Стили для навигации и хедера */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.navbar-nav .nav-item:last-child .nav-link {
+    background-color: rgba(255, 255, 255, 0.15);
+    margin-left: 0.5rem;
+}
+
+/* Стили для flash сообщений */
+.alert-messages {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1050;
+    min-width: 300px;
+}
+
+.alert-messages .alert {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 8px;
+}
+
+/* Адаптивность навигации */
+@media (max-width: 768px) {
+    .navbar-nav .nav-link {
+        margin: 0.2rem 0;
+    }
+
+    .alert-messages {
+        left: 20px;
+        right: 20px;
+    }
+}

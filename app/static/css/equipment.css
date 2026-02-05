@@ -1,0 +1,280 @@
+/* Стили для формы добавления оборудования */
+.equipment-form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.equipment-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.equipment-card .card-title {
+    color: white;
+    margin: 0;
+    font-weight: 600;
+}
+
+.equipment-card .card-body {
+    padding: 2rem;
+}
+
+.equipment-form .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.equipment-form .form-control:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    transform: translateY(-1px);
+}
+
+.equipment-form .form-label {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.equipment-form .btn-submit {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.equipment-form .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+}
+
+/* Анимация появления формы */
+.equipment-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность формы */
+@media (max-width: 768px) {
+    .equipment-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .equipment-form .btn-submit {
+        width: 100%;
+    }
+}
+/* Стили для страницы деталей оборудования */
+.equipment-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.equipment-detail-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1.5rem 2rem;
+}
+
+.equipment-detail-card .card-body {
+    padding: 2rem;
+}
+
+/* Сетка информации */
+.info-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--text-dark);
+    flex: 1;
+}
+
+/* Описание */
+.description-content {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+/* Карточки материалов */
+.material-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.material-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Пустое состояние */
+.empty-state {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+}
+
+/* Боковая панель */
+.equipment-sidebar .card {
+    border-radius: 10px;
+}
+
+.stats-item {
+    text-align: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.stats-item:last-child {
+    border-bottom: none;
+}
+
+.stats-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.stats-value {
+    font-weight: 700;
+}
+
+/* Хлебные крошки */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-dark);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .equipment-detail-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .info-label {
+        min-width: auto;
+    }
+
+    .info-grid {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .equipment-detail-card .card-header {
+        padding: 1.2rem;
+    }
+
+    .card-title.h3 {
+        font-size: 1.3rem;
+    }
+}
+
+.equipment-list-container {
+    padding: 20px 0;
+}
+
+.equipment-row:hover {
+    background-color: #f8f9fa;
+}
+
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.btn-group .btn {
+    border-radius: 0.25rem;
+    margin: 0 2px;
+}
+
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.form-select, .form-control {
+    border-radius: 0.375rem;
+}
+
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .equipment-list-container {
+        padding: 10px 0;
+    }
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
